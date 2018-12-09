@@ -4,13 +4,13 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 
 import { actions } from "../../actions";
-import { __await } from "tslib";
+import { globVars } from "../../globVars";
 
 export const AuthMain = styled.main`
   margin: 0;
-  height: 60vh;
+  height: 100vh;
   background-color: #b2bec3;
-  padding-top: 20vh;
+  padding-top: 5vh;
 `;
 
 const AuthSection = styled.section`
@@ -25,7 +25,9 @@ const AuthForm = styled.form`
   text-align: center;
 `;
 
-export const ButtonCont = styled.div``;
+export const ButtonCont = styled.div`
+  margin-top: 20px;
+`;
 
 export const SubButton = styled.button`
   border: 1px solid #0984e3;
@@ -33,7 +35,8 @@ export const SubButton = styled.button`
   background: none;
   padding: 10px 10px;
   margin: 10px;
-  font-size: 1em;
+  font-family: "Raleway", sans-serif;
+  font-size: 1.2em;
   cursor: pointer;
   transition: 0.4s;
   position: relative;
@@ -63,7 +66,7 @@ class SignIn extends Component {
   state = {
     login: "",
     password: "",
-    serverPath: "http://localhost:4200/users"
+    serverPath: globVars.serverPath
   };
 
   handleSubmit = () => {
@@ -74,12 +77,12 @@ class SignIn extends Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        login: this.state.login,
+        name: this.state.login,
         password: this.state.password
       })
     };
 
-    fetch(this.state.serverPath + "/login", logOptions)
+    fetch(this.state.serverPath + "/users/log", logOptions)
       .then(this.onResponse)
       .catch(reason => console.log(reason));
   };
