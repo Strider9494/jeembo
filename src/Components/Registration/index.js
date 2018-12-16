@@ -10,20 +10,24 @@ const AuthSection = styled.section`
   align-items: center;
 `;
 
-const FormTitle = styled.h2`
+export const FormTitle = styled.h2`
   font-family: "Raleway", sans-serif;
   font-weight: 500;
   margin-bottom: 10px;
 `;
 
-const AuthForm = styled.form`
+export const AuthForm = styled.form`
   width: 300px;
+  height: 300px;
   display: flex;
   flex-direction: column;
   text-align: center;
+  transition: all 0.5s;
+  overflow: hidden;
+  ${props => (props.reg ? "height: 0" : "")};
 `;
 
-const AuthInput = styled.input`
+export const AuthInput = styled.input`
   background: #dcdde1;
   border: solid 1px #00a8ff;
   padding: 5px;
@@ -32,13 +36,13 @@ const AuthInput = styled.input`
   font-family: "Cairo", sans-serif;
 `;
 
-const WarningContainer = styled.div`
+export const WarningContainer = styled.div`
   height: 2em;
   color: #e84118;
   font-size: 1.2em;
 `;
 
-const WarningMessage = styled.span`
+export const WarningMessage = styled.span`
   ${props => (!props.visable ? "display: none" : "")};
 `;
 
@@ -50,6 +54,7 @@ export default class Registration extends Component {
       password1: "",
       password2: ""
     },
+    reg: false,
     serverPath: globVars.serverPath,
     loginInvalid: false,
     emailInvalid: false,
@@ -65,39 +70,22 @@ export default class Registration extends Component {
   };
 
   handleChange = event => {
-    console.log(event.target.id);
     this.setState({
       form: { ...this.state.form, [event.target.id]: event.target.value }
     });
   };
 
   hanldeValid = event => {
-    switch (event.target.id) {
-      case "password2" || "password1":
-        if (this.state.form.password1 !== this.state.form.password2) {
-          this.setState({
-            passwordsNotSame: true
-          });
-          return;
-        } else {
-          this.setState({
-            passwordsNotSame: false
-          });
-          break;
-        }
-        defalult: if (
-          !this.state.shema[event.target.id].test(
-            this.state.form[event.target.id]
-          )
-        ) {
-          return this.setState({
-            [`${event.target.id}Invalid`]: true
-          });
-        } else {
-          return this.setState({
-            [`${event.target.id}Invalid`]: false
-          });
-        }
+    if (
+      !this.state.shema[event.target.id].test(this.state.form[event.target.id])
+    ) {
+      return this.setState({
+        [`${event.target.id}Invalid`]: true
+      });
+    } else {
+      return this.setState({
+        [`${event.target.id}Invalid`]: false
+      });
     }
   };
 
@@ -111,13 +99,14 @@ export default class Registration extends Component {
         });
       }
     }
-
+    this.validPasswords();
     if (valid) {
-      return;
+      return true;
     } else {
       this.setState({
         form: { ...this.state.form, password1: "", password2: "" }
       });
+      return false;
     }
   };
 
@@ -142,25 +131,45 @@ export default class Registration extends Component {
 
   onResponse = async response => {
     const json = await response.json();
-    console.log(json);
+    this.setState({
+      reg: json.reg
+    });
   };
 
   handleReg = async event => {
+    if (this.state.reg) {
+      return;
+    }
+    console.log("reg");
     if (!this.validForm()) return;
     this.sendForm();
+  };
+
+  validPasswords = () => {
+    if (this.state.form.password1 !== this.state.form.password2) {
+      this.setState({
+        passwordsNotSame: true
+      });
+    } else {
+      this.setState({
+        passwordsNotSame: false
+      });
+    }
   };
 
   render() {
     return (
       <AuthMain>
         <AuthSection>
-          <FormTitle>Create an account</FormTitle>
-          <AuthForm>
+          <FormTitle>
+            {this.state.reg ? "Account created!" : "Create an account"}
+          </FormTitle>
+          <AuthForm reg={this.state.reg}>
             <WarningContainer>
               <WarningMessage
                 visable={this.state.loginInvalid || this.state.password1Invalid}
               >
-                Invalid login or password!
+                Invalid login!
               </WarningMessage>
             </WarningContainer>
             <AuthInput
@@ -215,13 +224,15 @@ export default class Registration extends Component {
               onBlur={this.hanldeValid}
               placeholder="Repeat your password"
             />
-            <ButtonCont>
-              <SubButton type="button" onClick={this.handleReg}>
-                Registration
-              </SubButton>
-              <SubButton type="button">Back</SubButton>
-            </ButtonCont>
           </AuthForm>
+          <ButtonCont>
+            <SubButton type="button" onClick={this.handleReg}>
+              Registration
+            </SubButton>
+            <Link to={``}>
+              <SubButton type="button">Back</SubButton>
+            </Link>
+          </ButtonCont>
         </AuthSection>
       </AuthMain>
     );

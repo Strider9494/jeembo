@@ -2,9 +2,17 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import styled from "styled-components";
+import history from "../../history";
 
 import { actions } from "../../actions";
 import { globVars } from "../../globVars";
+import {
+  AuthInput,
+  WarningContainer,
+  WarningMessage,
+  AuthForm,
+  FormTitle
+} from "../Registration";
 
 export const AuthMain = styled.main`
   margin: 0;
@@ -16,13 +24,6 @@ export const AuthMain = styled.main`
 const AuthSection = styled.section`
   display: flex;
   justify-content: center;
-`;
-
-const AuthForm = styled.form`
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
 `;
 
 export const ButtonCont = styled.div`
@@ -66,10 +67,28 @@ class SignIn extends Component {
   state = {
     login: "",
     password: "",
-    serverPath: globVars.serverPath
+    serverPath: globVars.serverPath,
+    invalidForm: false,
+    invalid: false,
+    shema: {
+      login: /^[a-zA-Z0-9_-]{4,12}$/,
+      password: /^[a-zA-Z0-9]{4,12}$/
+    }
   };
 
   handleSubmit = () => {
+    if (
+      !this.state.shema.login.test(this.state.login) ||
+      !this.state.shema.password.test(this.state.password)
+    ) {
+      return this.setState({
+        invalidForm: true
+      });
+    } else {
+      this.setState({
+        invalidForm: false
+      });
+    }
     const logOptions = {
       method: "POST",
       headers: {
@@ -89,15 +108,27 @@ class SignIn extends Component {
 
   onResponse = async response => {
     const json = await response.json();
-    console.log(json);
-    json.log ? this.props.signIn() : console.log("log: false");
+    json.log ? this.props.signIn(json) : this.failSign(response.status);
+  };
+
+  failSign = status => {
+    if (status === 403) {
+      this.setState({
+        invalid: true
+      });
+    }
   };
 
   handleChange = event => {
-    console.log(event.target.id);
     this.setState({
       [event.target.id]: event.target.value
     });
+  };
+
+  enterForm = event => {
+    if (event.keyCode === 13) {
+      this.handleSubmit();
+    }
   };
 
   render() {
@@ -105,24 +136,30 @@ class SignIn extends Component {
       <AuthMain>
         <AuthSection>
           <AuthForm>
-            <label>
-              Login <br />
-              <input
-                id="login"
-                value={this.state.login}
-                onChange={this.handleChange}
-              />
-            </label>
-            <label>
-              Password <br />
-              <input
-                id="password"
-                type="password"
-                value={this.state.password}
-                onChange={this.handleChange}
-              />
-            </label>
-            <br />
+            <FormTitle>Sign in</FormTitle>
+            <WarningContainer>
+              <WarningMessage visable={this.state.invalid}>
+                Invalid login or password!
+              </WarningMessage>
+              <WarningMessage visable={this.state.invalidForm}>
+                Invalid length of login or password!
+              </WarningMessage>
+            </WarningContainer>
+            <AuthInput
+              id="login"
+              value={this.state.login}
+              onChange={this.handleChange}
+              placeholder="Login"
+            />
+            <WarningContainer />
+            <AuthInput
+              id="password"
+              type="password"
+              value={this.state.password}
+              onChange={this.handleChange}
+              onKeyDown={this.enterForm}
+              placeholder="Password"
+            />
             <ButtonCont>
               <SubButton type="button" onClick={this.handleSubmit}>
                 Login
@@ -143,8 +180,10 @@ export default connect(
     store: state
   }),
   dispatch => ({
-    signIn: () => {
-      dispatch({ type: actions.LOG_IN });
+    signIn: json => {
+      localStorage.setItem("token", json.token);
+      dispatch({ type: actions.LOG_IN, payload: json.user });
+      history.push("/home");
     }
   })
 )(SignIn);

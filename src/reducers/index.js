@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 
-import sign_in from "./sign_in";
+import sign from "./sign";
 
 export default combineReducers({
-  sign_in
+  sign
 });
