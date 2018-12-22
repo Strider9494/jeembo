@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import history from "../../history";
 
-import { actions } from "../../actions";
+import { actions, tryLog } from "../../actions";
 import { globVars } from "../../globVars";
 import {
   AuthInput,
@@ -100,10 +100,7 @@ class SignIn extends Component {
         password: this.state.password
       })
     };
-
-    fetch(this.state.serverPath + "/users/log", logOptions)
-      .then(this.onResponse)
-      .catch(reason => console.log(reason));
+    this.props.signIn(this.state.serverPath, logOptions);
   };
 
   onResponse = async response => {
@@ -180,10 +177,8 @@ export default connect(
     store: state
   }),
   dispatch => ({
-    signIn: json => {
-      localStorage.setItem("token", json.token);
-      dispatch({ type: actions.LOG_IN, payload: json.user });
-      history.push("/home");
+    signIn: (path, logOptions) => {
+      dispatch(tryLog(path, logOptions));
     }
   })
 )(SignIn);

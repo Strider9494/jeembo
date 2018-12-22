@@ -8,11 +8,10 @@ const logState = {
 const sign = (state = logState, action) => {
   switch (action.type) {
     case actions.LOG_IN:
-      return Object.assign({}, state, { log: true, user: action.payload });
+      return { ...state, log: true, user: action.payload.user };
     case actions.LOG_OUT:
-      return Object.assign({}, state, { log: false, user: "" });
+      return { ...state, log: false, user: "" };
     default:
-      Object.assign({}, state, { log: false, user: "" });
       return state;
   }
 };

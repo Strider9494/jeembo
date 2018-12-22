@@ -23,7 +23,7 @@ const StyledHeader = styled.div`
   justify-content: space-between;
 `;
 
-const Header_Title = styled.h1`
+const HeaderTitle = styled.h1`
   font-size: 3rem;
   color: #00cec9;
   line-height: 3rem;
@@ -34,7 +34,7 @@ const StyledLink = styled(Link)`
   text-decoration: none;
 `;
 
-const Head_IconConteiner = styled.button`
+const HeaderIconConteiner = styled.button`
   font-size: 3rem;
   color: #00cec9;
   margin-right: 5vw;
@@ -47,7 +47,7 @@ const Head_IconConteiner = styled.button`
   }
 `;
 
-const AvatarContainer = styled.div`
+const HeaderAvatar = styled.div`
   position: absolute;
   left: 50%;
   transform: translate(-50%);
@@ -69,23 +69,23 @@ class Header extends Component {
       <HeaderBackground>
         <StyledHeader>
           <StyledLink to={``}>
-            <Header_Title>JeemBo</Header_Title>
+            <HeaderTitle>JeemBo</HeaderTitle>
           </StyledLink>
           {this.props.store.sign.log ? (
-            <AvatarContainer src={this.props.store.sign.user.avatar} />
+            <HeaderAvatar src={this.props.store.sign.user.avatar} />
           ) : (
             ""
           )}
           {!this.props.store.sign.log ? (
             <StyledLink to={`/auth`}>
-              <Head_IconConteiner>
+              <HeaderIconConteiner>
                 <FontAwesomeIcon icon="sign-in-alt" />
-              </Head_IconConteiner>
+              </HeaderIconConteiner>
             </StyledLink>
           ) : (
-            <Head_IconConteiner onClick={this.props.signOut}>
+            <HeaderIconConteiner onClick={this.props.signOut}>
               <FontAwesomeIcon icon="sign-out-alt" />
-            </Head_IconConteiner>
+            </HeaderIconConteiner>
           )}
         </StyledHeader>
       </HeaderBackground>
@@ -99,7 +99,6 @@ export default connect(
   }),
   dispatch => ({
     signOut: () => {
-      console.log("click");
       localStorage.removeItem("token");
 
       dispatch({ type: actions.LOG_OUT });
