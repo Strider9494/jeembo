@@ -99,8 +99,7 @@ export default class Registration extends Component {
         });
       }
     }
-    this.validPasswords();
-    if (valid) {
+    if (valid && this.validPasswords()) {
       return true;
     } else {
       this.setState({
@@ -150,10 +149,12 @@ export default class Registration extends Component {
       this.setState({
         passwordsNotSame: true
       });
+      return false;
     } else {
       this.setState({
         passwordsNotSame: false
       });
+      return true;
     }
   };
 

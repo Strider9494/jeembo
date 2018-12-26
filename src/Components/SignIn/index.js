@@ -103,19 +103,6 @@ class SignIn extends Component {
     this.props.signIn(this.state.serverPath, logOptions);
   };
 
-  onResponse = async response => {
-    const json = await response.json();
-    json.log ? this.props.signIn(json) : this.failSign(response.status);
-  };
-
-  failSign = status => {
-    if (status === 403) {
-      this.setState({
-        invalid: true
-      });
-    }
-  };
-
   handleChange = event => {
     this.setState({
       [event.target.id]: event.target.value
@@ -135,7 +122,7 @@ class SignIn extends Component {
           <AuthForm>
             <FormTitle>Sign in</FormTitle>
             <WarningContainer>
-              <WarningMessage visable={this.state.invalid}>
+              <WarningMessage visable={this.props.store.sign.invalidLog}>
                 Invalid login or password!
               </WarningMessage>
               <WarningMessage visable={this.state.invalidForm}>

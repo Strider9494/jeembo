@@ -4,11 +4,15 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignInAlt, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSearch,
+  faSignInAlt,
+  faSignOutAlt
+} from "@fortawesome/free-solid-svg-icons";
 import { dispatch } from "rxjs/internal/observable/pairs";
 import { actions } from "../../actions";
 
-library.add(faSignInAlt, faSignOutAlt);
+library.add(faSignInAlt, faSignOutAlt, faSearch);
 
 const HeaderBackground = styled.header`
   background: #0984e3;
@@ -27,17 +31,16 @@ const HeaderTitle = styled.h1`
   font-size: 3rem;
   color: #00cec9;
   line-height: 3rem;
-  margin: 0 0 0 5vw;
+  margin: 0;
 `;
 
-const StyledLink = styled(Link)`
+export const StyledLink = styled(Link)`
   text-decoration: none;
 `;
 
 const HeaderIconConteiner = styled.button`
   font-size: 3rem;
   color: #00cec9;
-  margin-right: 5vw;
   background: 0;
   border: none;
   cursor: pointer;
@@ -47,10 +50,55 @@ const HeaderIconConteiner = styled.button`
   }
 `;
 
+const NavBar = styled.nav`
+  width: 800px;
+  position: relative;
+`;
+
+const SearchBox = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 170px;
+  transform: translate(-50%, -50%);
+  height: 40px;
+  background: #74b9ff;
+  border-radius: 40px;
+`;
+
+const SearchBar = styled.input`
+  border: none;
+  background: none;
+  outline: none;
+  float: left;
+  padding: 0;
+  transition: 0.4s;
+  line-height: 40px;
+  font-family: "Raleway", sans-serif;
+  font-size: 1rem;
+  width: 0;
+  :focus {
+    width: 240px;
+    padding-left: 10px;
+  }
+  .searchBox:hover & {
+    width: 240px;
+    padding-left: 10px;
+  }
+`;
+
+const SearchBtn = styled.button`
+  color: #0984e3;
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  border-radius: 40px;
+`;
+
 const HeaderAvatar = styled.div`
   position: absolute;
-  left: 50%;
-  transform: translate(-50%);
+  right: 30px;
   height: 50px;
   width: 50px;
   border: 1px solid #81ecec;
@@ -72,7 +120,23 @@ class Header extends Component {
             <HeaderTitle>JeemBo</HeaderTitle>
           </StyledLink>
           {this.props.store.sign.log ? (
-            <HeaderAvatar src={this.props.store.sign.user.avatar} />
+            <NavBar>
+              <SearchBox className="searchBox">
+                <SearchBar type="text" placeholder="Type to search" />
+                <SearchBtn>
+                  <FontAwesomeIcon icon="search" />
+                </SearchBtn>
+              </SearchBox>
+              <StyledLink to={`/home`}>
+                <HeaderAvatar
+                  src={
+                    this.props.store.sign.user.avatar
+                      ? this.props.store.sign.user.avatar
+                      : ""
+                  }
+                />
+              </StyledLink>
+            </NavBar>
           ) : (
             ""
           )}
