@@ -100,7 +100,7 @@ class SignIn extends Component {
         password: this.state.password
       })
     };
-    this.props.signIn(this.state.serverPath, logOptions);
+    this.props.signIn(this.state.serverPath + "/users/log", logOptions);
   };
 
   handleChange = event => {

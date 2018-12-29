@@ -10,7 +10,8 @@ import {
   faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
 import { dispatch } from "rxjs/internal/observable/pairs";
-import { actions } from "../../actions";
+import { actions, tryLog } from "../../actions";
+import { globVars } from "../../globVars";
 
 library.add(faSignInAlt, faSignOutAlt, faSearch);
 
@@ -20,7 +21,7 @@ const HeaderBackground = styled.header`
 
 const StyledHeader = styled.div`
   margin: 0 auto;
-  width: 1000px;
+  width: 1200px;
   position: relative;
   padding: 20px;
   display: flex;
@@ -51,7 +52,7 @@ const HeaderIconConteiner = styled.button`
 `;
 
 const NavBar = styled.nav`
-  width: 800px;
+  width: 1000px;
   position: relative;
 `;
 
@@ -61,7 +62,7 @@ const SearchBox = styled.div`
   left: 170px;
   transform: translate(-50%, -50%);
   height: 40px;
-  background: #74b9ff;
+  background: #00cec9;
   border-radius: 40px;
 `;
 
@@ -112,6 +113,24 @@ const HeaderAvatar = styled.div`
 `;
 
 class Header extends Component {
+  state = {
+    serverPath: globVars.serverPath
+  };
+
+  componentDidMount() {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const logOptions = {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        }
+      };
+      this.props.signIn(this.state.serverPath + "/users/auth", logOptions);
+    }
+  }
   render() {
     return (
       <HeaderBackground>
@@ -164,8 +183,10 @@ export default connect(
   dispatch => ({
     signOut: () => {
       localStorage.removeItem("token");
-
       dispatch({ type: actions.LOG_OUT });
+    },
+    signIn: (path, logOptions) => {
+      dispatch(tryLog(path, logOptions));
     }
   })
 )(Header);

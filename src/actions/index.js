@@ -9,7 +9,7 @@ export const actions = {
 
 export function tryLog(path, logOptions) {
   return dispatch => {
-    return fetch(path + "/users/log", logOptions)
+    return fetch(path, logOptions)
       .then(response => response.json(), err => console.log(err))
       .then(json => dispatch(receiveUserProps(json)))
       .catch(err => console.error(err));

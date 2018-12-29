@@ -11,10 +11,23 @@ const HomeMain = styled.main`
 `;
 
 const HomePageBody = styled.section`
-  width: 1000px;
+  width: 1200px;
   background: #a29bfe;
-  height: 1000px;
+  height: 100vh;
   margin: auto;
+  display: flex;
+`;
+
+const SideBar = styled.section`
+  width: 300px;
+  background: blue;
+  height: 100vh;
+`;
+
+const MainSection = styled.section`
+  width: 900px;
+  background: #a29bfe;
+  height: 100vh;
 `;
 
 class HomePage extends Component {
@@ -24,7 +37,10 @@ class HomePage extends Component {
         {!this.props.store.sign.log ? (
           <Redirect to={`/auth`} />
         ) : (
-          <HomePageBody />
+          <HomePageBody>
+            <SideBar />
+            <MainSection />
+          </HomePageBody>
         )}
       </HomeMain>
     );
