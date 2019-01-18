@@ -9,9 +9,9 @@ import {
   faSignInAlt,
   faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
-import { dispatch } from "rxjs/internal/observable/pairs";
-import { actions, tryLog } from "../../actions";
+import { actions, tryLog, searchUser } from "../../actions";
 import { globVars } from "../../globVars";
+import SearchResult from "../SearchResult";
 
 library.add(faSignInAlt, faSignOutAlt, faSearch);
 
@@ -95,6 +95,10 @@ const SearchBtn = styled.button`
   height: 40px;
   font-size: 20px;
   border-radius: 40px;
+  cursor: pointer;
+  :focus {
+    outline: none;
+  }
 `;
 
 const HeaderAvatar = styled.div`
@@ -114,10 +118,11 @@ const HeaderAvatar = styled.div`
 
 class Header extends Component {
   state = {
-    serverPath: globVars.serverPath
+    serverPath: globVars.serverPath,
+    search: ""
   };
 
-  componentDidMount() {
+  componentDidMount = () => {
     const token = localStorage.getItem("token");
     if (token) {
       const logOptions = {
@@ -130,7 +135,30 @@ class Header extends Component {
       };
       this.props.signIn(this.state.serverPath + "/users/auth", logOptions);
     }
-  }
+  };
+
+  handleChange = event => {
+    this.setState({
+      [event.target.id]: event.target.value
+    });
+  };
+
+  handleSearch = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const options = {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          searchUser: this.state.search
+        }
+      };
+      this.props.searchUser(this.state.serverPath + "/users/search", options);
+    }
+  };
+
   render() {
     return (
       <HeaderBackground>
@@ -141,11 +169,20 @@ class Header extends Component {
           {this.props.store.sign.log ? (
             <NavBar>
               <SearchBox className="searchBox">
-                <SearchBar type="text" placeholder="Type to search" />
-                <SearchBtn>
+                <SearchBar
+                  type="text"
+                  placeholder="Type to search"
+                  value={this.state.search}
+                  onChange={this.handleChange}
+                  id="search"
+                />
+                <SearchBtn onClick={this.handleSearch}>
                   <FontAwesomeIcon icon="search" />
                 </SearchBtn>
               </SearchBox>
+              {this.props.store.search.search && (
+                <SearchResult user={this.props.store.search.searchUser} />
+              )}
               <StyledLink to={`/home`}>
                 <HeaderAvatar
                   src={
@@ -187,6 +224,9 @@ export default connect(
     },
     signIn: (path, logOptions) => {
       dispatch(tryLog(path, logOptions));
+    },
+    searchUser: (path, options) => {
+      dispatch(searchUser(path, options));
     }
   })
 )(Header);
